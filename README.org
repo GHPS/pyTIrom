@@ -1,0 +1,94 @@
+* Introduction
+
+This repository provides two utilities for the TI99a core which is
+part of the MiSTer FPGA project. 
+
+Currently the TI core requires loading roms in the correct order which is a
+tedious process. Therefore, I wrote the Python program createImage.py.
+It takes the respective C, D and G roms, checks their availability and 
+packs them into a single, "full" rom file with
+the necessary padding applied. The utility works with the latest version of the
+TI core (Ti994a.rbf) and Python 3 (and legacy Python 2).
+
+While this is fast and easy for testing a small number of rom files, converting a larger
+number (or even hundreds) of files is still a lengthy task.
+Here the program convertArchive.py comes in handy. It takes a whole directory
+of rom files and batch converts them into full roms. To be processed
+the file names have to comply with a specific format (e.g.
+"A-Maze-Ing (1980)(Texas Instruments)[PHM 3030].G") which
+is used in some rom archives available.
+
+* Usage
+
+** createImage
+
+Usage of createImage is quite simple: Specify the OutputFile and the optional 
+Crom, Drom and Grom parameter. More verbose messages are generated with -v, MD5 checksums
+are generated with -c and help is available with -h. See the section Tests for examples.
+
+The easiest way to start is with an empty image. Besides the python utilities
+in this repository you'll need two files ("994AGROM-EP.Bin" and "994aROM.Bin") 
+containing the TI-99/4a firmware. These files are not open-sourced but some
+people provide them for download. Just google...
+
+** convertArchive
+
+Once createImage is set up correctly, convertArchive can be used
+to convert a full directory of C, D and G roms. The necessary parameters
+are almost the same except for fullromPath,  the directory where the full 
+rom files are created. This defaults to romPath but it's a good idea to create a
+directory upfront to store the newly created files in. The process to
+convert several hundred files usually takes less than a second.
+
+So a sample usage would be
+
+#+BEGIN_SRC sh
+convertArchive.py --systemromPath sysRom --romPath romArchive --fullromPath fullRom  -v 
+#+END_SRC
+
+* Tests
+
+I successfully tested the script with the following roms:
+
+    |------------------------+-----------------------------------------------------------------------------------------------|
+    | Cartridge Name         | Command                                                                                       |
+    |------------------------+-----------------------------------------------------------------------------------------------|
+    | Standard, no Cartridge | createImage.py -v defaultRom.bin                                                              |
+    | Diagnostic Tests       | createImage.py -v --Grom=DiagnosG.Bin diagnosticTests.bin                                     |
+    | Extended Basic         | createImage.py -v --Crom=TIEXTC.BIN --Drom=TIEXTD.BIN --Grom=TIEXTG.BIN extendedBasic.bin     |
+    | TI Logo II             | createImage.py -v --Crom=LOGOC.BIN --Grom=LOGOG.BIN Logo.bin                                  |
+    | Hunt the Wumpus        | createImage.py -v --Grom=WUMPUSG.BIN HuntTheWumpus.bin                                        |
+    | Parsec                 | createImage.py -v --Crom=PARSECC.BIN --Grom=PARSECG.BIN Parsec.bin                            |
+    | Tunnels of Doom        | createImage.py -v --Grom=TunDoomG.Bin TunnelsOfDoom.bin                                       |
+    | Fathom                 | createImage.py -v --Crom=FATHOMC.BIN --Drom=FATHOMD.BIN --Grom=FATHOMG.BIN Fathom.bin         |
+    | Mini Memory            | createImage.py -v --Crom=MiniMemC.Bin --Grom=MiniMemG.Bin MiniMemory.bin                      |
+    | Home Finance           | createImage.py -v --Grom=HomFDecG.Bin HomeFinance.bin                                         |
+    | Hustle                 | createImage.py -v --Grom=HustleG.Bin Hustle.bin                                               |
+    | TI-Editor-Assembler    | createImage.py -v --Grom=TIEAG.BIN TI-Editor-Assembler.bin                                    |
+    | A-Maze-ing             | createImage.py -v --Grom=AMAZEG.BIN a-maze-ing.bin                                            |
+    |------------------------+-----------------------------------------------------------------------------------------------|
+
+Currently missing is the support for diskIO and speech. The key problem with
+diskIO is that the patched/padded rom diskdsr_4000_padded8k.bin isn't available
+in the core repo anymore. With speech I need more info concerning which rom to
+use and where to place it in memory.
+
+To make debugging easier I also added MD5 checksums for all input and the output file.
+The checksums are enabled with -c (which also enables -v to make any sense).
+
+* Limits
+
+Currently there is no support for DiskIO and for Speech due missing information about the memory layout.
+
+Working with these utilities I came across a number of non-working roms, e.g. Demostration where both versions (1979 and 198x) are affected.
+Checksums are
+- Demonstration ROM (1970)/Full ROM: a01a87e959f38c2bd01e8247b2c5abc2 / 45248e48fcec3c73bb6af263769eb371
+- Demonstration ROM (198x)/Full ROM: a77c109097647929b49e46bcd1a74a96 / 8714d54872c236e4ce59650f0470ac1d
+
+* Updates
+
+- 21.07.2018: Version 1.1 Added Python 2 Support and Updated ROM List
+- 25.07.2018: Version 1.5 Support for romPath, systemromPath and MD5 checksums
+- 27.07.2018: Version 1.6 Code refactoring: Allow use as a library
+- 07.08.2019  Version 1.7 Removed Python 2 support due to end-of-life
+
