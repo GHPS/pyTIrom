@@ -10,6 +10,7 @@
 #  1.5 Support for romPath, systemromPath and MD5 checksums
 #  1.6 Code refactoring: Allow use as a library
 #  1.7 Removed Python 2 support due to end-of-life
+#  1.8 Byte precise padding
 
 import argparse
 import hashlib
@@ -47,7 +48,7 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
         if fVerbose: print('== Copying input files ==')
         with open(stOutputFile,'wb') as fOutputFile:
             for lsBlock in lsMemoryMap:
-                iPaddingRequired=8
+                iPaddingSize=pow(2,16)
                 for stCurrentFile in lsBlock:
                     if stCurrentFile!='':
                         if fVerbose: print('Copying %-28s' % stCurrentFile,end=' ')
@@ -57,17 +58,16 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
                                 stChecksum=hashlib.md5(vSingleFile).hexdigest()
                             fOutputFile.write(vSingleFile)
                         if fVerbose: print('done',end='')
-                        iClustersCurrentFile=os.path.getsize(stCurrentFile)//8192
-                        if fCheck: print(', MD5 Checksum:',stChecksum, end=' ')
-                        if fVerbose: print(' (',iClustersCurrentFile,' cluster of 8k occupied)', sep='')
-                        iPaddingRequired-=iClustersCurrentFile
+                        iClustersCurrentFile=os.path.getsize(stCurrentFile)
+                        if fCheck: print(f', MD5 Checksum: {stChecksum}', end=' ')
+                        if fVerbose: print(f' ({iClustersCurrentFile}k occupied)', sep='')
+                        iPaddingSize-=iClustersCurrentFile
                     else:
-                        if iPaddingRequired>0:
-                            if fVerbose: print('Padding',iPaddingRequired,'clusters of 8k')
-                            for iFill in range(iPaddingRequired):
-                                with open('hole8k','rb') as fCurrentFile:
-                                    fOutputFile.write(fCurrentFile.read())
-                            iPaddingRequired=0
+                        if iPaddingSize>0:
+                            if fVerbose: print(f'Applying {iPaddingSize}k of padding.')
+                            vPadding=bytearray([0]*iPaddingSize)
+                            fOutputFile.write(vPadding)
+                            iPaddingSize=0
                 if fVerbose: print('-------')
         if fVerbose: print('Target ROM',stOutputFile,'created',end='')
         if fCheck:
