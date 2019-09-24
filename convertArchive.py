@@ -7,6 +7,7 @@
 # Versions
 #  1.0 Initial release
 #  1.1 Removed Python 2 support due to end-of-life
+#  1.2 More flexible naming scheme for input files
 
 import argparse
 import os
@@ -39,7 +40,11 @@ if __name__ == "__main__":
     for stFileName in lsFiles:
         if (stFileName.find('[a]')==-1) and (stFileName.find('[o]')==-1):
             iEndCartrigeName=stFileName.find(' (')
-            stCartrigeName=stFileName[iStartCartridgeName:iEndCartrigeName]
+            if iEndCartrigeName!=-1:
+                stCartrigeName=stFileName[iStartCartridgeName:iEndCartrigeName]
+            else:
+                print('** Warning: File mismatches naming scheme - continuing with complete file name **')
+                stCartrigeName=stFileName[iStartCartridgeName:-2]
             if lsArguments.verbose: print('Adding',stFileName,'to',stCartrigeName)
             if stCartrigeName in dcFiles:
                 dcFiles.update({stCartrigeName:dcFiles[stCartrigeName]+[stFileName]})
