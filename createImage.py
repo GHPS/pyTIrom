@@ -12,7 +12,7 @@
 #  1.7  Removed Python 2 support due to end-of-life
 #  1.8  Byte precise padding
 #  1.85 Removed 'holeX' files, more verbose output
-#  1.9  Generate listing of cartidges
+#  1.9  Generate listing of cartridges
 
 import argparse
 import hashlib

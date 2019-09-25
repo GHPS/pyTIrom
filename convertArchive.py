@@ -9,7 +9,7 @@
 #  1.1  Removed Python 2 support due to end-of-life
 #  1.2  More flexible naming scheme for input files
 #  1.21 Converted to f-strings
-#  1.3  Generate listing of cartidges
+#  1.3  Generate listing of cartridges
 
 import argparse
 import os
