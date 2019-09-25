@@ -9,23 +9,28 @@
 #  1.1  Removed Python 2 support due to end-of-life
 #  1.2  More flexible naming scheme for input files
 #  1.21 Converted to f-strings
+#  1.3  Generate listing of cartidges
 
 import argparse
 import os
 import sys
 import glob
+import hashlib
 from datetime import datetime
 from createImage import createRom
 
 
 if __name__ == "__main__":
     vParser = argparse.ArgumentParser()
-    vParser.add_argument('--romPath',help="The path to the roms - C, D, G (default .).",type=str, default='')
-    vParser.add_argument('--fullromPath',help="The directory where the Rom files are created.",type=str,default='')
-    vParser.add_argument('--systemromPath',help="The path to the system roms.",type=str, default='')
-    vParser.add_argument("-c","--check", help='Checksum files - generate MD5 sums for input and output files (implies --verbose)',action="store_true")
-    vParser.add_argument("-v","--verbose", help='Display respective actions and results.',action="store_true")
+    vParser.add_argument('--romPath',help='The path to the roms - C, D, G (default .).',type=str, default='')
+    vParser.add_argument('--fullromPath',help='The directory where the Rom files are created.',type=str,default='')
+    vParser.add_argument('-l','--listing',help='File name of a listing with all cartidges processed.',type=str, default='')
+    vParser.add_argument('--systemromPath',help='The path to the system roms.',type=str, default='')
+    vParser.add_argument('-c','--check', help='Checksum files - generate MD5 sums for input and output files (implies --verbose)',action="store_true")
+    vParser.add_argument('-v','--verbose', help='Display respective actions and results.',action="store_true")
     lsArguments = vParser.parse_args()
+
+    stFileNameListing=lsArguments.listing
 
     if lsArguments.fullromPath=='':
         lsArguments.fullromPath=lsArguments.romPath
@@ -37,6 +42,7 @@ if __name__ == "__main__":
         iStartCartridgeName=0
     else:
         iStartCartridgeName=len(lsArguments.romPath)+1
+
     dcFiles={}
     for stFileName in lsFiles:
         if (stFileName.find('[a]')==-1) and (stFileName.find('[o]')==-1):
@@ -51,6 +57,7 @@ if __name__ == "__main__":
                 dcFiles.update({stCartrigeName:dcFiles[stCartrigeName]+[stFileName]})
             else:
                 dcFiles.update({stCartrigeName:[stFileName]})
+
     iCartridgesConverted=0
     iExitCode=0
     for stCartridgeName in sorted(dcFiles):
@@ -68,6 +75,17 @@ if __name__ == "__main__":
         elif iExitCode==0:
             iExitCode=iResult
         print()
+
+    if stFileNameListing:
+        lsFiles=sorted([x for x in dcFiles])
+        iMaxLength=len(max(lsFiles,key=len))
+        with open(stFileNameListing,'w') as fListingFile:
+            for stFile in lsFiles:
+                with open(os.path.join(lsArguments.fullromPath,stFile)+'.bin','rb') as fCurrentFile:
+                    vSingleFile=fCurrentFile.read()
+                    stChecksum=hashlib.md5(vSingleFile).hexdigest()
+                fListingFile.write(f'| {stFile:<{iMaxLength}s} | {stChecksum:32s} |     |     |\n')
+
     if lsArguments.verbose:
         vTimeDelta=datetime.now()-vStartTime
         print(f'{iCartridgesConverted} cartridges created in {vTimeDelta.total_seconds():2.2f} seconds.')
