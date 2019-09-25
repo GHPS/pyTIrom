@@ -53,7 +53,7 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
         if fVerbose: print('-- Copying input files --\n\nMemory Map\n--------')
         with open(stOutputFile,'wb') as fOutputFile:
             for lsBlock in lsMemoryMap:
-                iPaddingSize=pow(2,16)
+                iPaddingSize=65536
                 for vCurrentSegment in lsBlock:
                     if type(vCurrentSegment) is str:
                         if fVerbose: print(f'Copying {vCurrentSegment:<30s}' ,end=' ')
