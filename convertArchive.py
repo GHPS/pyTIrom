@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # File: convertArchive.py
 # Description: Create full TI-99 rom images from a directory containing C, D and G roms.
-# Version 1.1
+# Version 1.3
 # Author: GHPS
 # License: GPL-3.0
 # Versions

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # File: createImage.py
 # Description: Create a full TI-99 rom image from C, D, G and system roms.
-# Version 1.7
+# Version 1.9
 # Author: GHPS
 # License: GPL-3.0
 # Versions
@@ -12,6 +12,7 @@
 #  1.7  Removed Python 2 support due to end-of-life
 #  1.8  Byte precise padding
 #  1.85 Removed 'holeX' files, more verbose output
+#  1.9  Generate listing of cartidges
 
 import argparse
 import hashlib
