@@ -10,6 +10,7 @@
 #  1.2  More flexible naming scheme for input files
 #  1.21 Converted to f-strings
 #  1.3  Generate listing of cartridges
+#  1.35 Generate listing of cartridges
 
 import argparse
 import os
@@ -84,7 +85,10 @@ if __name__ == "__main__":
                 with open(os.path.join(lsArguments.fullromPath,stFile)+'.bin','rb') as fCurrentFile:
                     vSingleFile=fCurrentFile.read()
                     stChecksum=hashlib.md5(vSingleFile).hexdigest()
-                fListingFile.write(f'| {stFile:<{iMaxLength}s} | {stChecksum:32s} |         |         |\n')
+                if stFileNameListing[-3:]=='csv':
+                    fListingFile.write(f'{stFile};{stChecksum};;;\n')
+                else:
+                    fListingFile.write(f'| {stFile:<{iMaxLength}s} | {stChecksum:32s} |         |         |\n')
 
     if lsArguments.verbose:
         vTimeDelta=datetime.now()-vStartTime
