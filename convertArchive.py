@@ -9,8 +9,8 @@
 #  1.1  Removed Python 2 support due to end-of-life
 #  1.2  More flexible naming scheme for input files
 #  1.21 Converted to f-strings
-#  1.3  Generate listing of cartridges
-#  1.35 Generate listing of cartridges
+#  1.3  Generate txt listing of cartridges
+#  1.35 Generate csv listing of cartridges
 
 import argparse
 import os
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     vParser = argparse.ArgumentParser()
     vParser.add_argument('--romPath',help='The path to the roms - C, D, G (default .).',type=str, default='')
     vParser.add_argument('--fullromPath',help='The directory where the Rom files are created.',type=str,default='')
-    vParser.add_argument('-l','--listing',help='File name of a listing with all cartidges processed.',type=str, default='')
+    vParser.add_argument('-l','--listing',help='File name of a listing with all cartidges processed (.txt or .csv).',type=str, default='')
     vParser.add_argument('--systemromPath',help='The path to the system roms.',type=str, default='')
     vParser.add_argument('-c','--check', help='Checksum files - generate MD5 sums for input and output files (implies --verbose)',action="store_true")
     vParser.add_argument('-v','--verbose', help='Display respective actions and results.',action="store_true")
