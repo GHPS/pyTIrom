@@ -5,9 +5,10 @@
 # Author: GHPS
 # License: GPL-3.0
 # Versions
-#  1.0 Initial release
-#  1.1 Removed Python 2 support due to end-of-life
-#  1.2 More flexible naming scheme for input files
+#  1.0  Initial release
+#  1.1  Removed Python 2 support due to end-of-life
+#  1.2  More flexible naming scheme for input files
+#  1.21 Converted to f-strings
 
 import argparse
 import os
@@ -45,7 +46,7 @@ if __name__ == "__main__":
             else:
                 print('** Warning: File mismatches naming scheme - continuing with complete file name **')
                 stCartrigeName=stFileName[iStartCartridgeName:-2]
-            if lsArguments.verbose: print('Adding',stFileName,'to',stCartrigeName)
+            if lsArguments.verbose: print(f'Adding {stFileName} to {stCartrigeName}')
             if stCartrigeName in dcFiles:
                 dcFiles.update({stCartrigeName:dcFiles[stCartrigeName]+[stFileName]})
             else:
@@ -60,7 +61,7 @@ if __name__ == "__main__":
             if stFileName[-1]=='C': stCromFileName=stFileName
             if stFileName[-1]=='D': stDromFileName=stFileName
             if stFileName[-1]=='G': stGromFileName=stFileName
-        if lsArguments.verbose: print('Creating cartrige',stCartridgeName)
+        if lsArguments.verbose: print(f'== Creating cartrige {stCartridgeName} ==')
         iResult=createRom(stOutputFile=os.path.join(lsArguments.fullromPath,stCartridgeName)+'.bin', stCrom=stCromFileName,stDrom=stDromFileName,stGrom=stGromFileName,stSystemromPath=lsArguments.systemromPath,fCheck=lsArguments.check, fVerbose=lsArguments.verbose)
         if iResult==0:
             iCartridgesConverted+=1
