@@ -5,12 +5,13 @@
 # Author: GHPS
 # License: GPL-3.0
 # Versions
-#  1.0 Initial release
-#  1.1 Python 2 support
-#  1.5 Support for romPath, systemromPath and MD5 checksums
-#  1.6 Code refactoring: Allow use as a library
-#  1.7 Removed Python 2 support due to end-of-life
-#  1.8 Byte precise padding
+#  1.0  Initial release
+#  1.1  Python 2 support
+#  1.5  Support for romPath, systemromPath and MD5 checksums
+#  1.6  Code refactoring: Allow use as a library
+#  1.7  Removed Python 2 support due to end-of-life
+#  1.8  Byte precise padding
+#  1.85 Removed 'holeX' files, more verbose output
 
 import argparse
 import hashlib
@@ -18,25 +19,29 @@ import os.path
 
 
 def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSystemromPath='',fCheck=False, fVerbose=False):
-    lsMemoryMap=[['', '', ''],['994AGROM-EP.Bin', 'hole32k','', ''],['hole8k', 'hole32k', '994aROM.Bin', '', '']]
+
+    lsMemoryMap=[[None, None, None],
+                 ['994AGROM-EP.Bin',32768,None, None],
+                 [8192,32768, '994aROM.Bin', None, None]]
+
     if (stSystemromPath=='') and (stRomPath!=''):
         stSystemromPath=stRomPath
 
-    if (stSystemromPath):
+    if stSystemromPath:
         lsMemoryMap[1][0]=os.path.join(stSystemromPath,lsMemoryMap[1][0])
         lsMemoryMap[2][2]=os.path.join(stSystemromPath,lsMemoryMap[2][2])
-    if (stCrom is not None):
+    if stCrom:
         lsMemoryMap[0][0]=os.path.join(stRomPath,stCrom)
-    if (stDrom is not None):
+    if stDrom:
         lsMemoryMap[0][1]=os.path.join(stRomPath,stDrom)
-    if (stGrom is not None):
+    if stGrom:
         lsMemoryMap[1][1]=os.path.join(stRomPath,stGrom)
 
     if fCheck: fVerbose=True
-    if fVerbose: print('== Checking input files ==')
+    if fVerbose: print('-- Checking input files --')
     lsMissingFiles=[]
-    for stInputFile in sorted(set([stFileName for lsOuterList in lsMemoryMap for stFileName in lsOuterList if stFileName!=''])):
-        if fVerbose: print('Checking %-27s' % stInputFile,end=' ')
+    for stInputFile in sorted(set([stFileName for lsOuterList in lsMemoryMap for stFileName in lsOuterList if type(stFileName) is str])):
+        if fVerbose: print(f'Checking {stInputFile:<30s}' ,end=' ')
         if os.path.isfile(stInputFile):
             if fVerbose: print('found')
         else:
@@ -45,23 +50,28 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
     if fVerbose: print()
 
     if lsMissingFiles==[]:
-        if fVerbose: print('== Copying input files ==')
+        if fVerbose: print('-- Copying input files --\n\nMemory Map\n--------')
         with open(stOutputFile,'wb') as fOutputFile:
             for lsBlock in lsMemoryMap:
                 iPaddingSize=pow(2,16)
-                for stCurrentFile in lsBlock:
-                    if stCurrentFile!='':
-                        if fVerbose: print('Copying %-28s' % stCurrentFile,end=' ')
-                        with open(stCurrentFile,'rb') as fCurrentFile:
+                for vCurrentSegment in lsBlock:
+                    if type(vCurrentSegment) is str:
+                        if fVerbose: print(f'Copying {vCurrentSegment:<30s}' ,end=' ')
+                        with open(vCurrentSegment,'rb') as fCurrentFile:
                             vSingleFile=fCurrentFile.read()
                             if fCheck:
                                 stChecksum=hashlib.md5(vSingleFile).hexdigest()
                             fOutputFile.write(vSingleFile)
                         if fVerbose: print('done',end='')
-                        iClustersCurrentFile=os.path.getsize(stCurrentFile)
+                        iClustersCurrentFile=os.path.getsize(vCurrentSegment)
                         if fCheck: print(f', MD5 Checksum: {stChecksum}', end=' ')
                         if fVerbose: print(f' ({iClustersCurrentFile}k occupied)', sep='')
                         iPaddingSize-=iClustersCurrentFile
+                    elif type(vCurrentSegment) is int:
+                        if fVerbose: print(f'Filling reserved {vCurrentSegment}k.')
+                        vEmptySegment=bytearray([0]*vCurrentSegment)
+                        fOutputFile.write(vEmptySegment)
+                        iPaddingSize-=vCurrentSegment
                     else:
                         if iPaddingSize>0:
                             if fVerbose: print(f'Applying {iPaddingSize}k of padding.')
@@ -69,12 +79,12 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
                             fOutputFile.write(vPadding)
                             iPaddingSize=0
                 if fVerbose: print('-------')
-        if fVerbose: print('Target ROM',stOutputFile,'created',end='')
+        if fVerbose: print(f'Target ROM {stOutputFile} created',end='')
         if fCheck:
             with open(stOutputFile,'rb') as fOutputFile:
                 vSingleFile=fOutputFile.read()
                 stChecksum=hashlib.md5(vSingleFile).hexdigest()
-            print(', MD5 Checksum:',stChecksum)
+            print(f', MD5 Checksum: {stChecksum}')
         else:
             print('')
         iReturnCode=0
