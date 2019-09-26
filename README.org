@@ -27,14 +27,14 @@ Crom, Drom and Grom parameter. More verbose messages are generated with -v, MD5 
 are generated with -c and help is available with -h. See the section Tests for examples.
 
 The easiest way to start is with an empty image. Besides the python utilities
-in this repository you'll need two files ("994AGROM-EP.Bin" and "994aROM.Bin") 
+in this repository you'll need two files ("994AGROM.BIN" and "994AROM.BIN") 
 containing the TI-99/4a firmware. These files are not open-sourced but some
 people provide them for download. Just google - but make sure to get the right
 versions:
 
 #+BEGIN_SRC sh
-994aROM.Bin, MD5 Checksum: 6cc4bc2b6b3b0c33698e6a03759a4cab
-994AGROM-EP.Bin, MD5 Checksum: ed8ff714542ba850bdec686840a79217
+994AROM.BIN, MD5 Checksum: 6cc4bc2b6b3b0c33698e6a03759a4cab
+994AGROM.BIN, MD5 Checksum: ed8ff714542ba850bdec686840a79217
 #+END_SRC
 
 ** convertArchive
