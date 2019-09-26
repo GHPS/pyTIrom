@@ -13,8 +13,8 @@ import os.path
 def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSystemromPath='',fCheck=False, fVerbose=False):
 
     lsMemoryMap=[[None, None, None],
-                 ['994AGROM-EP.Bin',32768,None, None],
-                 [8192,32768, '994aROM.Bin', None, None]]
+                 ['994AGROM.BIN',32768,None, None],
+                 [8192,32768, '994AROM.BIN', None, None]]
 
     if (stSystemromPath=='') and (stRomPath!=''):
         stSystemromPath=stRomPath
