@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
 # File: createImage.py
+# Repository: pyTIrom
 # Description: Create a full TI-99 rom image from C, D, G and system roms.
-# Version 1.9
 # Author: GHPS
 # License: GPL-3.0
-# Versions
-#  1.0  Initial release
-#  1.1  Python 2 support
-#  1.5  Support for romPath, systemromPath and MD5 checksums
-#  1.6  Code refactoring: Allow use as a library
-#  1.7  Removed Python 2 support due to end-of-life
-#  1.8  Byte precise padding
-#  1.85 Removed 'holeX' files, more verbose output
-#  1.9  Generate listing of cartridges
 
 import argparse
 import hashlib
@@ -51,7 +42,7 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
     if fVerbose: print()
 
     if lsMissingFiles==[]:
-        if fVerbose: print('-- Copying input files --\n\nMemory Map\n--------')
+        if fVerbose: print('-- Copying input files --\n\nMemory Map\n-------')
         with open(stOutputFile,'wb') as fOutputFile:
             for lsBlock in lsMemoryMap:
                 iPaddingSize=65536

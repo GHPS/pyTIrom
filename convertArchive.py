@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
 # File: convertArchive.py
+# Repository: pyTIrom
 # Description: Create full TI-99 rom images from a directory containing C, D and G roms.
-# Version 1.3
 # Author: GHPS
 # License: GPL-3.0
-# Versions
-#  1.0  Initial release
-#  1.1  Removed Python 2 support due to end-of-life
-#  1.2  More flexible naming scheme for input files
-#  1.21 Converted to f-strings
-#  1.3  Generate txt listing of cartridges
-#  1.35 Generate csv listing of cartridges
 
 import argparse
 import os
