@@ -18,7 +18,7 @@ if __name__ == "__main__":
     vParser = argparse.ArgumentParser()
     vParser.add_argument('--romPath',help='The path to the roms - C, D, G (default .).',type=str, default='')
     vParser.add_argument('--fullromPath',help='The directory where the Rom files are created.',type=str,default='')
-    vParser.add_argument('-l','--listing',help='File name of a listing with all cartidges processed (.txt or .csv).',type=str, default='')
+    vParser.add_argument('-l','--listing',help='Name of a listing file with all cartidges processed (.txt and .csv format supported).',type=str, default='')
     vParser.add_argument('--systemromPath',help='The path to the system roms.',type=str, default='')
     vParser.add_argument('-c','--check', help='Checksum files - generate MD5 sums for input and output files (implies --verbose)',action="store_true")
     vParser.add_argument('-v','--verbose', help='Display respective actions and results.',action="store_true")
@@ -71,6 +71,7 @@ if __name__ == "__main__":
         print()
 
     if stFileNameListing:
+        stListingFormat=stFileNameListing[-3:].lower()
         lsFiles=sorted([x for x in dcFiles])
         iMaxLength=len(max(lsFiles,key=len))
         with open(stFileNameListing,'w') as fListingFile:
@@ -78,10 +79,12 @@ if __name__ == "__main__":
                 with open(os.path.join(lsArguments.fullromPath,stFile)+'.bin','rb') as fCurrentFile:
                     vSingleFile=fCurrentFile.read()
                     stChecksum=hashlib.md5(vSingleFile).hexdigest()
-                if stFileNameListing[-3:]=='csv':
+                if stListingFormat=='csv':
                     fListingFile.write(f'{stFile};{stChecksum};;;\n')
-                else:
+                elif stListingFormat=='txt':
                     fListingFile.write(f'| {stFile:<{iMaxLength}s} | {stChecksum:32s} |         |         |\n')
+                else:
+                    raise ValueError(f'Unknown file format {stListingFormat}')
 
     if lsArguments.verbose:
         vTimeDelta=datetime.now()-vStartTime

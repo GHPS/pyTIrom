@@ -81,7 +81,7 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
             print('')
         iReturnCode=0
     else:
-        print(len(lsMissingFiles),"files missing:",end=' ')
+        print(f'{len(lsMissingFiles)} files missing:',end=' ')
         print(*lsMissingFiles,sep=', ')
         print('No ROM file created')
         iReturnCode=66   # EX_NOINPUT
