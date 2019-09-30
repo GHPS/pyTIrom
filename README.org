@@ -23,7 +23,8 @@ is used in some rom archives available.
 ** createImage
 
 Usage of createImage is quite simple: Specify the OutputFile and the optional 
-Crom, Drom and Grom parameter. More verbose messages are generated with -v, MD5 checksums
+Crom, Drom and Grom parameter. Support for disk I/O is enabled with -d,
+for speech with -s. More verbose messages are generated with -v, MD5 checksums
 are generated with -c and help is available with -h. See the section Tests for examples.
 
 The easiest way to start is with an empty image. Besides the python utilities
@@ -36,6 +37,16 @@ versions:
 994AROM.BIN, MD5 Checksum: 6cc4bc2b6b3b0c33698e6a03759a4cab
 994AGROM.BIN, MD5 Checksum: ed8ff714542ba850bdec686840a79217
 #+END_SRC
+
+To use disk I/O or the speech synthesizer additional rom files are
+needed:
+
+#+BEGIN_SRC sh
+Disk.Bin, MD5 Checksum: 3169cfe66687d5b9ed45a69da5a12817
+Spchrom.bin, MD5 Checksum: 7adcaf64272248f7a7161cfc02fd5b3f 
+#+END_SRC
+
+Note the correct case of the file names.
 
 ** convertArchive
 
@@ -75,12 +86,7 @@ I successfully tested the script with the following roms:
     | A-Maze-ing             | createImage.py -v --Grom=AMAZEG.BIN a-maze-ing.bin                                            |
     |------------------------+-----------------------------------------------------------------------------------------------|
 
-Currently missing is the support for diskIO and speech. The key problem with
-diskIO is that the patched/padded rom diskdsr_4000_padded8k.bin isn't available
-in the core repo anymore. With speech I need more info concerning which rom to
-use and where to place it in memory.
-
-To make debugging easier I also added MD5 checksums for all input and the output file.
+To make debugging easier I've also added MD5 checksums for all input and the output file.
 The checksums are enabled with -c (which also enables -v to make any sense).
 
 * Limits
