@@ -10,7 +10,7 @@ import hashlib
 import os.path
 
 
-def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSystemromPath='',fCheck=False, fVerbose=False, fDiskIO=False):
+def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSystemromPath='',fCheck=False, fVerbose=False, fDiskIO=False, fSpeech=False):
 
     lsMemoryMap=[[None, None, None],
                  ['994AGROM.BIN',32768,None, None],
@@ -30,6 +30,8 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
         lsMemoryMap[1][1]=os.path.join(stRomPath,stGrom)
     if fDiskIO:
         lsMemoryMap[2][0]=os.path.join(stSystemromPath,'Disk.Bin')
+    if fSpeech:
+        lsMemoryMap.extend([[None],[os.path.join(stSystemromPath,'Spchrom.bin')]])
 
 
     if fCheck: fVerbose=True
@@ -99,10 +101,12 @@ if __name__ == "__main__":
     vParser.add_argument('--Grom',help="The G Rom file to use.",type=str)
     vParser.add_argument('--romPath',help="The path to the all roms - C, D, G and system roms (default .).",type=str, default='')
     vParser.add_argument('--systemromPath',help="The path to the system roms. Takes precedence over --romPath (default .).",type=str, default='')
-    vParser.add_argument("-c","--check", help='Checksum files - generate MD5 sums for input and output files (implies --verbose)',action="store_true")
-    vParser.add_argument("-d","--diskIO", help='Support disk I/O (experimental feature).',action="store_true")
-    vParser.add_argument("-s","--speech", help='Support speech synthesizer (future feature).',action="store_true")
+    vParser.add_argument("-c","--check", help='Checksum files - generate MD5 sums for input and output files (implies --verbose).',action="store_true")
+    vParser.add_argument("-d","--diskIO", help='Support for disk I/O.',action="store_true")
+    vParser.add_argument("-s","--speech", help='Support for speech synthesizer.',action="store_true")
     vParser.add_argument("-v","--verbose", help='Display respective actions and results.',action="store_true")
     lsArguments = vParser.parse_args()
 
-    createRom(stOutputFile=lsArguments.OutputFile, stCrom=lsArguments.Crom,stDrom=lsArguments.Drom,stGrom=lsArguments.Grom,stRomPath=lsArguments.romPath,stSystemromPath=lsArguments.systemromPath,fCheck=lsArguments.check, fVerbose=lsArguments.verbose, fDiskIO=lsArguments.diskIO)
+    createRom(stOutputFile=lsArguments.OutputFile,
+              stCrom=lsArguments.Crom,stDrom=lsArguments.Drom,stGrom=lsArguments.Grom,stRomPath=lsArguments.romPath,stSystemromPath=lsArguments.systemromPath,
+              fCheck=lsArguments.check, fVerbose=lsArguments.verbose, fDiskIO=lsArguments.diskIO, fSpeech=lsArguments.speech)
