@@ -103,4 +103,5 @@ Currently there is no support for DiskIO and for Speech due missing information 
 - 25.09.2019  Version 1.85 Removed 'holeX' files, more verbose output
 - 25.09.2019  Version 1.9  Generate listing of cartridges (txt and csv format)
 - 26.09.2019  Version 1.95 Standard file names and experimental diskIO support
+- 30.09.2019  Version 2.0  Enabled disk I/O and speech support
 
