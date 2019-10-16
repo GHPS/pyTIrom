@@ -57,13 +57,14 @@ directory upfront to store the newly created files in. The scheme used
 in the archive for naming the files can be specified with the -n option.
 These schemes are currently supported:
 
-    |----------+--------------------------------------------------+----------------|
-    | Scheme   | Input File Name                                  | Cartridge Name |
-    |----------+--------------------------------------------------+----------------|
-    | None     | Ant-eater.C                                      | Ant-eater      |
-    | Standard | A-Maze-Ing (1980)(Texas Instruments)[PHM 3030].G | A-Maze-Ing     |
-    | Timrad   | TunDoomG.Bin                                     | TunDoom        |
-    |----------+--------------------------------------------------+----------------|
+    |----------+------------------------------------------------------------+----------------|
+    | Scheme   | Input File Name                                            | Cartridge Name |
+    |----------+------------------------------------------------------------+----------------|
+    | None     | Ant-eater.C                                                | Ant-eater      |
+    | Standard | A-Maze-Ing (1980)(Texas Instruments)[PHM 3030].G           | A-Maze-Ing     |
+    | Timrad   | TunDoomG.Bin                                               | TunDoom        |
+    | Tosec    | Parsec (1982)(Texas Instruments)(File 1 of 2)(Parsecc).bin | Parsec         |
+    |----------+------------------------------------------------------------+----------------|
 
 An output listing can be generated with -l output.txt. The process to
 convert several hundred files usually takes less than a second.

@@ -16,7 +16,7 @@ from createImage import createRom
 dcNamingScheme={'None':['*.[CDG]',-1,'.',''],                 # e.g. 'File Name: Name xxx.c  -> Cartridge: Name xxx'
                 'Standard':['*.[CDG]',-1,'(',['[a]','[o]']],  # e.g. 'File Name: Name (Year) xxx.c -> Cartridge: Name'
                 'Timrad':['*.Bin',-5,'.',''],                 # e.g. 'File Name: NameA.bin -> Cartridge: Name'
-                'Tosec':['*.bin',-5,'.','']}                  # e.g. 'File Name: Name (Year).bin -> Cartridge: Name'
+                'Tosec':['*.bin',-6,'(','']}                  # e.g. 'File Name: Name (Year) (xxxc).bin -> Cartridge: Name'
 
 def extractCartridgeName(stFileName, stNamingScheme):
     iEndCartrigeName=stFileName.find(dcNamingScheme[stNamingScheme][2])
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     vParser.add_argument('--romPath',help='The path to the roms - C, D, G (default .).',type=str, default='')
     vParser.add_argument('--imagePath',help='The directory where the Rom files are created.',type=str,default='')
     vParser.add_argument('-l','--listing',help='Name of a listing file with all cartidges processed (.txt and .csv format supported).',type=str, default='')
-    vParser.add_argument('-n','--naming',help='Naming scheme of the archive (None, Standard, Timrad are supported)',type=str, default='Standard')
+    vParser.add_argument('-n','--naming',help='Naming scheme of the archive (None, Standard, Timrad, Tosec are supported)',type=str, default='Standard')
     vParser.add_argument('--systemromPath',help='The path to the system roms.',type=str, default='')
     vParser.add_argument('--simulate',help='Simulation run without creation of files.',action="store_true")
     vParser.add_argument('-c','--check', help='Checksum files - generate MD5 sums for input and output files (implies --verbose)',action="store_true")
@@ -73,7 +73,6 @@ if __name__ == "__main__":
                 if lsArguments.verbose: print(f"Skipping {stFileName} since the ROM type can't be determined.")
         else:
             if lsArguments.verbose: print(f"Skipping {stFileName} since it's an alternative version.")
-
 
     iCartridgesConverted=0
     iExitCode=0
