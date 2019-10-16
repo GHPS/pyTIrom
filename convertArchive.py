@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # File: convertArchive.py
 # Repository: pyTIrom
-# Description: Create full TI-99 rom images from a directory containing C, D and G roms.
+# Description: Create TI-99 memory images from a directory containing C, D and G roms.
 # Author: GHPS
 # License: GPL-3.0
 
@@ -13,25 +13,46 @@ import hashlib
 from datetime import datetime
 from createImage import createRom
 
+dcNamingScheme={'None':['*.[CDG]',-1,'.',''],                 # e.g. 'File Name: Name xxx.c  -> Cartridge: Name xxx'
+                'Standard':['*.[CDG]',-1,'(',['[a]','[o]']],  # e.g. 'File Name: Name (Year) xxx.c -> Cartridge: Name'
+                'Timrad':['*.Bin',-5,'.',''],                 # e.g. 'File Name: NameA.bin -> Cartridge: Name'
+                'Tosec':['*.bin',-5,'.','']}                  # e.g. 'File Name: Name (Year).bin -> Cartridge: Name'
+
+def extractCartridgeName(stFileName, stNamingScheme):
+    iEndCartrigeName=stFileName.find(dcNamingScheme[stNamingScheme][2])
+    if iEndCartrigeName!=-1:
+        stCartrigeName=stFileName[iStartCartridgeName:iEndCartrigeName-1]
+    else:
+        print('** Warning: File mismatches naming scheme - continuing with complete file name **')
+        stCartrigeName=stFileName[iStartCartridgeName:-2]
+    return stCartrigeName
+
 
 if __name__ == "__main__":
     vParser = argparse.ArgumentParser()
     vParser.add_argument('--romPath',help='The path to the roms - C, D, G (default .).',type=str, default='')
-    vParser.add_argument('--fullromPath',help='The directory where the Rom files are created.',type=str,default='')
+    vParser.add_argument('--imagePath',help='The directory where the Rom files are created.',type=str,default='')
     vParser.add_argument('-l','--listing',help='Name of a listing file with all cartidges processed (.txt and .csv format supported).',type=str, default='')
+    vParser.add_argument('-n','--naming',help='Naming scheme of the archive (None, Standard, Timrad are supported)',type=str, default='Standard')
     vParser.add_argument('--systemromPath',help='The path to the system roms.',type=str, default='')
+    vParser.add_argument('--simulate',help='Simulation run without creation of files.',action="store_true")
     vParser.add_argument('-c','--check', help='Checksum files - generate MD5 sums for input and output files (implies --verbose)',action="store_true")
+    vParser.add_argument("-d","--diskIO", help='Support for disk I/O.',action="store_true")
+    vParser.add_argument("-s","--speech", help='Support for speech synthesizer.',action="store_true")
     vParser.add_argument('-v','--verbose', help='Display respective actions and results.',action="store_true")
     lsArguments = vParser.parse_args()
 
-    stFileNameListing=lsArguments.listing
+    if lsArguments.simulate: print('** SIMULATION **')
 
-    if lsArguments.fullromPath=='':
-        lsArguments.fullromPath=lsArguments.romPath
-        print(lsArguments.fullromPath)
+    stFileNameListing=lsArguments.listing
+    stNamingScheme=lsArguments.naming
+
+    if lsArguments.imagePath=='':
+        lsArguments.imagePath=lsArguments.romPath
+        print(lsArguments.imagePath)
 
     vStartTime=datetime.now()
-    lsFiles=glob.glob(os.path.join(lsArguments.romPath,'*.[CDG]'))
+    lsFiles=glob.glob(os.path.join(lsArguments.romPath,dcNamingScheme[stNamingScheme][0]))
     if lsArguments.romPath=='':
         iStartCartridgeName=0
     else:
@@ -39,18 +60,20 @@ if __name__ == "__main__":
 
     dcFiles={}
     for stFileName in lsFiles:
-        if (stFileName.find('[a]')==-1) and (stFileName.find('[o]')==-1):
-            iEndCartrigeName=stFileName.find(' (')
-            if iEndCartrigeName!=-1:
-                stCartrigeName=stFileName[iStartCartridgeName:iEndCartrigeName]
-            else:
-                print('** Warning: File mismatches naming scheme - continuing with complete file name **')
-                stCartrigeName=stFileName[iStartCartridgeName:-2]
+        if dcNamingScheme[stNamingScheme][3]=='' or not any((stNamePart in stFileName for stNamePart in dcNamingScheme[stNamingScheme][3])):  # Select main version, not [o]ther or [a]lternative
+            stCartrigeName=extractCartridgeName(stFileName, stNamingScheme)
             if lsArguments.verbose: print(f'Adding {stFileName} to {stCartrigeName}')
-            if stCartrigeName in dcFiles:
-                dcFiles.update({stCartrigeName:dcFiles[stCartrigeName]+[stFileName]})
+            stFileType=stFileName[dcNamingScheme[stNamingScheme][1]].upper()
+            if stFileType in 'CDG':
+                if stCartrigeName in dcFiles:
+                    dcFiles.update({stCartrigeName:dcFiles[stCartrigeName]+[(stFileName, stFileType)]})
+                else:
+                    dcFiles.update({stCartrigeName:[(stFileName, stFileType)]})
             else:
-                dcFiles.update({stCartrigeName:[stFileName]})
+                if lsArguments.verbose: print(f"Skipping {stFileName} since the ROM type can't be determined.")
+        else:
+            if lsArguments.verbose: print(f"Skipping {stFileName} since it's an alternative version.")
+
 
     iCartridgesConverted=0
     iExitCode=0
@@ -58,12 +81,21 @@ if __name__ == "__main__":
         stCromFileName=''
         stDromFileName=''
         stGromFileName=''
-        for stFileName in dcFiles[stCartridgeName]:
-            if stFileName[-1]=='C': stCromFileName=stFileName
-            if stFileName[-1]=='D': stDromFileName=stFileName
-            if stFileName[-1]=='G': stGromFileName=stFileName
+        for stFileName, stFileType in dcFiles[stCartridgeName]:
+            if stFileType=='C': stCromFileName=stFileName
+            elif stFileType=='D': stDromFileName=stFileName
+            elif stFileType=='G': stGromFileName=stFileName
         if lsArguments.verbose: print(f'== Creating cartrige {stCartridgeName} ==')
-        iResult=createRom(stOutputFile=os.path.join(lsArguments.fullromPath,stCartridgeName)+'.bin', stCrom=stCromFileName,stDrom=stDromFileName,stGrom=stGromFileName,stSystemromPath=lsArguments.systemromPath,fCheck=lsArguments.check, fVerbose=lsArguments.verbose)
+        if lsArguments.simulate:
+            print('createRom(stOutputFile=',os.path.join(lsArguments.imagePath,stCartridgeName)+'.bin',
+                  ',stCrom=',stCromFileName,',stDrom=',stDromFileName,',stGrom=',stGromFileName,',stSystemromPath=',lsArguments.systemromPath,
+                  ',fCheck=',lsArguments.check, ',fVerbose=',lsArguments.verbose, ',fDiskIO=',lsArguments.diskIO, ',fSpeech=',lsArguments.speech,')',sep='')
+            iResult=-1
+        else:
+            iResult=createRom(stOutputFile=os.path.join(lsArguments.imagePath,stCartridgeName)+'.bin',
+                              stCrom=stCromFileName,stDrom=stDromFileName,stGrom=stGromFileName,stSystemromPath=lsArguments.systemromPath,
+                              fCheck=lsArguments.check, fVerbose=lsArguments.verbose, fDiskIO=lsArguments.diskIO, fSpeech=lsArguments.speech)
+
         if iResult==0:
             iCartridgesConverted+=1
         elif iExitCode==0:
@@ -76,7 +108,7 @@ if __name__ == "__main__":
         iMaxLength=len(max(lsFiles,key=len))
         with open(stFileNameListing,'w') as fListingFile:
             for stFile in lsFiles:
-                with open(os.path.join(lsArguments.fullromPath,stFile)+'.bin','rb') as fCurrentFile:
+                with open(os.path.join(lsArguments.imagePath,stFile)+'.bin','rb') as fCurrentFile:
                     vSingleFile=fCurrentFile.read()
                     stChecksum=hashlib.md5(vSingleFile).hexdigest()
                 if stListingFormat=='csv':
@@ -87,6 +119,9 @@ if __name__ == "__main__":
                     raise ValueError(f'Unknown file format {stListingFormat}')
 
     if lsArguments.verbose:
-        vTimeDelta=datetime.now()-vStartTime
-        print(f'{iCartridgesConverted} cartridges created in {vTimeDelta.total_seconds():2.2f} seconds.')
+        if lsArguments.simulate:
+            print('** SIMULATION **')
+        else:
+            vTimeDelta=datetime.now()-vStartTime
+            print(f'{iCartridgesConverted} cartridges created in {vTimeDelta.total_seconds():2.2f} seconds.')
     sys.exit(iExitCode)
