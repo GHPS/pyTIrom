@@ -1,7 +1,7 @@
 * Introduction
 
-This repository provides two utilities for the TI99a core which is
-part of the MiSTer FPGA project. 
+This repository provides two utilities for the [[https://github.com/MiSTer-devel/TI-99_4A_MiSTer][TI-99/4a]] 
+core which is part of the [[https://github.com/MiSTer-devel][MiSTer]] FPGA project. 
 
 Currently the TI core requires loading roms in the correct order which is a
 tedious process. Therefore, I wrote the Python program createImage.py.
@@ -15,7 +15,7 @@ number (or even hundreds) of files is still a lengthy task.
 Here the program convertArchive.py comes in handy. It takes a whole directory
 of rom files and batch converts them into memory images. To be processed
 correctly the file names have to comply with one of the specific formats 
-used in the rom archives available (e.g. Timrad).
+used in the rom archives available (e.g. Timrad or Tosec).
 
 * Usage
 
@@ -55,7 +55,7 @@ are almost the same except for imagePath,  the directory where the memory image
 files are created. This defaults to romPath but it's a good idea to create a
 directory upfront to store the newly created files in. The scheme used
 in the archive for naming the files can be specified with the -n option.
-These schemes are currently supported:
+The following schemes are currently supported:
 
     |----------+------------------------------------------------------------+----------------|
     | Scheme   | Input File Name                                            | Cartridge Name |
