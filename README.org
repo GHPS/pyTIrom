@@ -6,17 +6,16 @@ part of the MiSTer FPGA project.
 Currently the TI core requires loading roms in the correct order which is a
 tedious process. Therefore, I wrote the Python program createImage.py.
 It takes the respective C, D and G roms, checks their availability and 
-packs them into a single, "full" rom file with
+packs them into a single memory image (aka "full rom") file with
 the necessary padding applied. The utility works with the latest version of the
 TI core (Ti994a.rbf) and Python 3 (and legacy Python 2).
 
 While this is fast and easy for testing a small number of rom files, converting a larger
 number (or even hundreds) of files is still a lengthy task.
 Here the program convertArchive.py comes in handy. It takes a whole directory
-of rom files and batch converts them into full roms. To be processed
-the file names have to comply with a specific format (e.g.
-"A-Maze-Ing (1980)(Texas Instruments)[PHM 3030].G") which
-is used in some rom archives available.
+of rom files and batch converts them into memory images. To be processed
+correctly the file names have to comply with one of the specific formats 
+used in the rom archives available (e.g. Timrad).
 
 * Usage
 
@@ -52,16 +51,27 @@ Note the correct case of the file names.
 
 Once createImage is set up correctly, convertArchive can be used
 to convert a full directory of C, D and G roms. The necessary parameters
-are almost the same except for fullromPath,  the directory where the full 
-rom files are created. This defaults to romPath but it's a good idea to create a
-directory upfront to store the newly created files in. An output listing
-can be generated with -l output.txt. The process to
+are almost the same except for imagePath,  the directory where the memory image
+files are created. This defaults to romPath but it's a good idea to create a
+directory upfront to store the newly created files in. The scheme used
+in the archive for naming the files can be specified with the -n option.
+These schemes are currently supported:
+
+    |----------+--------------------------------------------------+----------------|
+    | Scheme   | Input File Name                                  | Cartridge Name |
+    |----------+--------------------------------------------------+----------------|
+    | None     | Ant-eater.C                                      | Ant-eater      |
+    | Standard | A-Maze-Ing (1980)(Texas Instruments)[PHM 3030].G | A-Maze-Ing     |
+    | Timrad   | TunDoomG.Bin                                     | TunDoom        |
+    |----------+--------------------------------------------------+----------------|
+
+An output listing can be generated with -l output.txt. The process to
 convert several hundred files usually takes less than a second.
 
 So a sample usage would be
 
 #+BEGIN_SRC sh
-convertArchive.py --systemromPath sysRom --romPath romArchive --fullromPath fullRom  -v 
+convertArchive.py --systemromPath sysRom --romPath romArchive --imagePath images  -v 
 #+END_SRC
 
 * Tests
@@ -104,4 +114,4 @@ Currently there is no support for DiskIO and for Speech due missing information 
 - 25.09.2019  Version 1.9  Generate listing of cartridges (txt and csv format)
 - 26.09.2019  Version 1.95 Standard file names and experimental diskIO support
 - 30.09.2019  Version 2.0  Enabled disk I/O and speech support
-
+- 16.10.2019  Version 2.1  Support for different naming schemes and simulation
