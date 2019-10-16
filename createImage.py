@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # File: createImage.py
 # Repository: pyTIrom
-# Description: Create a full TI-99 rom image from C, D, G and system roms.
+# Description: Create a TI-99 memory image from C, D, G and system roms.
 # Author: GHPS
 # License: GPL-3.0
 
@@ -33,7 +33,6 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
     if fSpeech:
         lsMemoryMap.extend([[None],[os.path.join(stSystemromPath,'Spchrom.bin')]])
 
-
     if fCheck: fVerbose=True
     if fVerbose: print('-- Checking input files --')
     lsMissingFiles=[]
@@ -47,13 +46,13 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
     if fVerbose: print()
 
     if lsMissingFiles==[]:
-        if fVerbose: print('-- Copying input files --\n\nMemory Map\n-------')
+        if fVerbose: print('-- Copying input files --\n\n|--------------\n|Image Map\n|--------------')
         with open(stOutputFile,'wb') as fOutputFile:
             for lsBlock in lsMemoryMap:
                 iPaddingSize=65536
                 for vCurrentSegment in lsBlock:
                     if type(vCurrentSegment) is str:
-                        if fVerbose: print(f'Copying {vCurrentSegment:<30s}' ,end=' ')
+                        if fVerbose: print(f'|  Copying {vCurrentSegment:<30s}' ,end=' ')
                         with open(vCurrentSegment,'rb') as fCurrentFile:
                             vSingleFile=fCurrentFile.read()
                             if fCheck:
@@ -65,18 +64,18 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
                         if fVerbose: print(f' ({iClustersCurrentFile}k occupied)', sep='')
                         iPaddingSize-=iClustersCurrentFile
                     elif type(vCurrentSegment) is int:
-                        if fVerbose: print(f'Filling reserved {vCurrentSegment}k.')
-                        vEmptySegment=bytearray([0]*vCurrentSegment)
+                        if fVerbose: print(f'|  Filling reserved {vCurrentSegment}k.')
+                        vEmptySegment=bytes([0]*vCurrentSegment)
                         fOutputFile.write(vEmptySegment)
                         iPaddingSize-=vCurrentSegment
                     else:
                         if iPaddingSize>0:
-                            if fVerbose: print(f'Applying {iPaddingSize}k of padding.')
-                            vPadding=bytearray([0]*iPaddingSize)
+                            if fVerbose: print(f'|  Applying {iPaddingSize}k of padding.')
+                            vPadding=bytes([0]*iPaddingSize)
                             fOutputFile.write(vPadding)
                             iPaddingSize=0
-                if fVerbose: print('-------')
-        if fVerbose: print(f'Target ROM {stOutputFile} created',end='')
+                if fVerbose: print('|--------------')
+        if fVerbose: print(f'\nTarget ROM {stOutputFile} created',end='')
         if fCheck:
             with open(stOutputFile,'rb') as fOutputFile:
                 vSingleFile=fOutputFile.read()
@@ -95,7 +94,7 @@ def createRom(stOutputFile='',stCrom='',stDrom='',stGrom='',stRomPath='',stSyste
 
 if __name__ == "__main__":
     vParser = argparse.ArgumentParser()
-    vParser.add_argument('OutputFile',help="The Full Rom file to be created.",type=str)
+    vParser.add_argument('OutputFile',help="The memory image to be created.",type=str)
     vParser.add_argument('--Crom',help="The C Rom file to use.",type=str)
     vParser.add_argument('--Drom',help="The D Rom file to use.",type=str)
     vParser.add_argument('--Grom',help="The G Rom file to use.",type=str)
