@@ -8,7 +8,7 @@ tedious process. The Python program createImage.py takes care of this job.
 It checks the respective C, D and G roms for availability and 
 packs them into a single memory image (aka "full rom") file with
 the necessary padding applied. The utility works with the latest version of the
-TI core (Ti994a.rbf) and Python (Python 3 only).
+TI core (Ti994a.rbf) and Python (Python 3.6 or newer).
 
 While this is fast and easy for testing a small number of rom files, converting a larger
 number (or even hundreds) of files is still a lengthy task.
