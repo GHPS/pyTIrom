@@ -10,7 +10,7 @@ import os
 import sys
 import glob
 import hashlib
-from datetime import datetime
+import datetime as dt
 from createImage import createRom
 
 dcNamingScheme={'None':['*.[CDG]',-1,'.',''],                 # e.g. 'File Name: Name xxx.c  -> Cartridge: Name xxx'
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         lsArguments.imagePath=lsArguments.romPath
         print(lsArguments.imagePath)
 
-    vStartTime=datetime.now()
+    dtStartTime=dt.datetime.now()
     lsFiles=glob.glob(os.path.join(lsArguments.romPath,dcNamingScheme[stNamingScheme][0]))
     if lsArguments.romPath=='':
         iStartCartridgeName=0
@@ -121,6 +121,6 @@ if __name__ == "__main__":
         if lsArguments.simulate:
             print('** SIMULATION **')
         else:
-            vTimeDelta=datetime.now()-vStartTime
-            print(f'{iCartridgesConverted} cartridges created in {vTimeDelta.total_seconds():2.2f} seconds.')
+            dtTimeDelta=dt.datetime.now()-dtStartTime
+            print(f'{iCartridgesConverted} cartridges created in {dtTimeDelta/dt.timedelta(seconds=1):2.2f} seconds.')
     sys.exit(iExitCode)
