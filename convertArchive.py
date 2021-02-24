@@ -57,7 +57,10 @@ if __name__ == "__main__":
     if lsArguments.romPath=='':
         iStartCartridgeName=0
     else:
-        iStartCartridgeName=len(lsArguments.romPath)+1
+        iStartCartridgeName=len(lsArguments.romPath)
+        if lsArguments.romPath[-1] not in ['/', '\\']:
+            iStartCartridgeName+=1
+
 
     dcFiles={}
     for stFileName in lsFiles:
