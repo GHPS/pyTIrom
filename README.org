@@ -102,7 +102,8 @@ The checksums are enabled with -c (which also enables -v to make any sense).
 
 * Limits
 
-Currently there is no support for DiskIO and for Speech due missing information about the memory layout.
+Currently there is support for DiskIO and for Speech - but only in theory, i.e. it is completely untested
+since the TI-99 cores doesn't support it yet.
 
 * Updates
 
