@@ -15,7 +15,7 @@ from createImage import createRom
 
 dcNamingScheme={'None':['*.[CDG]',-1,'.',''],                 # e.g. 'File Name: Name xxx.c  -> Cartridge: Name xxx'
                 'Standard':['*.[CDG]',-1,'(',['[a]','[o]']],  # e.g. 'File Name: Name (Year) xxx.c -> Cartridge: Name'
-                'Timrad':['*.Bin',-5,'.',''],                 # e.g. 'File Name: NameA.bin -> Cartridge: Name'
+                'Timrad':['*.Bin',-5,'.',''],                 # e.g. 'File Name: NameC.bin -> Cartridge: Name'
                 'Tosec':['*.bin',-6,'(','']}                  # e.g. 'File Name: Name (Year) (xxxc).bin -> Cartridge: Name'
 
 def extractCartridgeName(stFileName, stNamingScheme):
@@ -53,6 +53,7 @@ if __name__ == "__main__":
 
     dtStartTime=dt.datetime.now()
     lsFiles=glob.glob(os.path.join(lsArguments.romPath,dcNamingScheme[stNamingScheme][0]))
+    lsFiles=sorted(lsFiles)
     if lsArguments.romPath=='':
         iStartCartridgeName=0
     else:
@@ -88,12 +89,12 @@ if __name__ == "__main__":
         if lsArguments.simulate:
             print('createRom(stOutputFile=',os.path.join(lsArguments.imagePath,stCartridgeName)+'.bin',
                   ',stCrom=',stCromFileName,',stDrom=',stDromFileName,',stGrom=',stGromFileName,',stSystemromPath=',lsArguments.systemromPath,
-                  ',fCheck=',lsArguments.check, ',fVerbose=',lsArguments.verbose, ',fDiskIO=',lsArguments.diskIO, ',fSpeech=',lsArguments.speech,')',sep='')
+                  ',blCheck=',lsArguments.check, ',blVerbose=',lsArguments.verbose, ',blDiskIO=',lsArguments.diskIO, ',blSpeech=',lsArguments.speech,')',sep='')
             iResult=-1
         else:
             iResult=createRom(stOutputFile=os.path.join(lsArguments.imagePath,stCartridgeName)+'.bin',
                               stCrom=stCromFileName,stDrom=stDromFileName,stGrom=stGromFileName,stSystemromPath=lsArguments.systemromPath,
-                              fCheck=lsArguments.check, fVerbose=lsArguments.verbose, fDiskIO=lsArguments.diskIO, fSpeech=lsArguments.speech)
+                              blCheck=lsArguments.check, blVerbose=lsArguments.verbose, blDiskIO=lsArguments.diskIO, blSpeech=lsArguments.speech)
 
         if iResult==0:
             iCartridgesConverted+=1
