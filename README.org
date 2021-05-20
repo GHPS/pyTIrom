@@ -103,11 +103,11 @@ The checksums are enabled with -c (which also enables -v to make any sense).
 * Limits
 
 Currently there is support for DiskIO and for Speech - but only in theory, i.e. it is completely untested
-since the TI-99 core doesn't support it yet.
+since the TI-99 core doesn't support it yet (as of May 2021).
 
 * Updates
 
-- 20.05.2021  Version 2.1  Converted to pathlib, refactoring
+- 20.05.2021  Version 2.2  Converted to pathlib, refactoring
 - 16.10.2019  Version 2.1  Support for different naming schemes and simulation
 - 30.09.2019  Version 2.0  Enabled disk I/O and speech support
 - 26.09.2019  Version 1.95 Standard file names and experimental diskIO support
