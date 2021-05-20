@@ -8,24 +8,25 @@
 import argparse
 import os
 import sys
-import glob
 import hashlib
+import pathlib
 import datetime as dt
 from createImage import createRom
 
-dcNamingScheme={'None':['*.[CDG]',-1,'.',''],                 # e.g. 'File Name: Name xxx.c  -> Cartridge: Name xxx'
-                'Standard':['*.[CDG]',-1,'(',['[a]','[o]']],  # e.g. 'File Name: Name (Year) xxx.c -> Cartridge: Name'
-                'Timrad':['*.Bin',-5,'.',''],                 # e.g. 'File Name: NameC.bin -> Cartridge: Name'
-                'Tosec':['*.bin',-6,'(','']}                  # e.g. 'File Name: Name (Year) (xxxc).bin -> Cartridge: Name'
+dcNamingScheme={'None':['*.[CDG]', -1, '.', ''],                 # e.g. File Name: Name xxx.c  -> Cartridge: Name xxx'
+                'Standard':['*.[CDG]', -1, '(', ['[a]','[o]']],  # e.g. Standard Archive: File Name: Name (Year) xxx.c -> Cartridge: Name'
+                'Timrad':['*.Bin', -5, '.', ''],                 # e.g. Timrad Archive: File Name: NameC.bin -> Cartridge: Name'
+                'Tosec':['*.bin', -6, '(', '']}                  # e.g. Tosec Archive: File Name: Name (Year) (xxxc).bin -> Cartridge: Name'
+# Description: Archive Name: [Valid Extensions, Position File Type, End of Cartidge Name, Ignore Types]
 
 def extractCartridgeName(stFileName, stNamingScheme):
-    iEndCartrigeName=stFileName.find(dcNamingScheme[stNamingScheme][2])
-    if iEndCartrigeName!=-1:
-        stCartrigeName=stFileName[iStartCartridgeName:iEndCartrigeName-1]
+    iEndCartridge=stFileName.find(dcNamingScheme[stNamingScheme][2])
+    if iEndCartridge!=-1:
+        stCartridgeName=stFileName[0:iEndCartridge-1]
     else:
         print('** Warning: File mismatches naming scheme - continuing with complete file name **')
-        stCartrigeName=stFileName[iStartCartridgeName:-2]
-    return stCartrigeName
+        stCartridgeName=stFileName[0:-2]
+    return stCartridgeName
 
 
 if __name__ == "__main__":
@@ -52,28 +53,23 @@ if __name__ == "__main__":
         print(lsArguments.imagePath)
 
     dtStartTime=dt.datetime.now()
-    lsFiles=glob.glob(os.path.join(lsArguments.romPath, dcNamingScheme[stNamingScheme][0]))
-    lsFiles=sorted(lsFiles)
-    if lsArguments.romPath=='':
-        iStartCartridgeName=0
-    else:
-        iStartCartridgeName=len(lsArguments.romPath.rstrip('/\\'))+1
+    lsFiles=sorted(pathlib.Path(lsArguments.romPath).glob(dcNamingScheme[stNamingScheme][0]))
 
     dcFiles={}
-    for stFileName in lsFiles:
-        if dcNamingScheme[stNamingScheme][3]=='' or not any((stNamePart in stFileName for stNamePart in dcNamingScheme[stNamingScheme][3])):  # Select main version, not [o]ther or [a]lternative
-            stCartrigeName=extractCartridgeName(stFileName, stNamingScheme)
-            if lsArguments.verbose: print(f'Adding {stFileName} to {stCartrigeName}')
-            stFileType=stFileName[dcNamingScheme[stNamingScheme][1]].upper()
+    for pFileName in lsFiles:
+        if dcNamingScheme[stNamingScheme][3]=='' or not any((stNamePart in pFileName.name for stNamePart in dcNamingScheme[stNamingScheme][3])):  # Select main version, not [o]ther or [a]lternative
+            stCartridgeName=extractCartridgeName(pFileName.name, stNamingScheme)
+            if lsArguments.verbose: print(f'Adding {pFileName.name} to {stCartridgeName}')
+            stFileType=pFileName.name[dcNamingScheme[stNamingScheme][1]].upper()
             if stFileType in 'CDG':
-                if stCartrigeName in dcFiles:
-                    dcFiles.update({stCartrigeName:dcFiles[stCartrigeName]+[(stFileName, stFileType)]})
+                if stCartridgeName in dcFiles:
+                    dcFiles.update({stCartridgeName:dcFiles[stCartridgeName]+[(str(pFileName), stFileType)]})
                 else:
-                    dcFiles.update({stCartrigeName:[(stFileName, stFileType)]})
+                    dcFiles.update({stCartridgeName:[(str(pFileName), stFileType)]})
             else:
-                if lsArguments.verbose: print(f"Skipping {stFileName} since the ROM type can't be determined.")
+                if lsArguments.verbose: print(f"Skipping {pFileName.name} since the ROM type can't be determined.")
         else:
-            if lsArguments.verbose: print(f"Skipping {stFileName} since it's an alternative version.")
+            if lsArguments.verbose: print(f"Skipping {pFileName.name} since it's an alternative version.")
 
     iCartridgesConverted=0
     iExitCode=0
