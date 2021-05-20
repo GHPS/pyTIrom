@@ -30,17 +30,17 @@ def extractCartridgeName(stFileName, stNamingScheme):
 
 if __name__ == "__main__":
     vParser = argparse.ArgumentParser()
-    vParser.add_argument('--romPath',help='The path to the roms - C, D, G (default .).',type=str, default='')
-    vParser.add_argument('--imagePath',help='The directory where the Rom files are created.',type=str,default='')
-    vParser.add_argument('-l','--listing',help='Name of a listing file with all cartidges processed (.txt and .csv format supported).',type=str, default='')
-    vParser.add_argument('-n','--naming',help='Naming scheme of the archive (None, Standard, Timrad, Tosec are supported)',type=str, default='Standard')
-    vParser.add_argument('--systemromPath',help='The path to the system roms.',type=str, default='')
-    vParser.add_argument('--simulate',help='Simulation run without creation of files.',action="store_true")
+    vParser.add_argument('--romPath', help='The path to the roms - C, D, G (default .).',type=str, default='')
+    vParser.add_argument('--imagePath', help='The directory where the Rom files are created.',type=str,default='')
+    vParser.add_argument('-l','--listing', help='Name of a listing file with all cartidges processed (.txt and .csv format supported).',type=str, default='')
+    vParser.add_argument('-n','--naming', help='Naming scheme of the archive (None, Standard, Timrad, Tosec are supported)',type=str, default='Standard')
+    vParser.add_argument('--systemromPath', help='The path to the system roms.',type=str, default='')
+    vParser.add_argument('--simulate', help='Simulation run without creation of files.',action="store_true")
     vParser.add_argument('-c','--check', help='Checksum files - generate MD5 sums for input and output files (implies --verbose)',action="store_true")
     vParser.add_argument("-d","--diskIO", help='Support for disk I/O.',action="store_true")
     vParser.add_argument("-s","--speech", help='Support for speech synthesizer.',action="store_true")
     vParser.add_argument('-v','--verbose', help='Display respective actions and results.',action="store_true")
-    lsArguments = vParser.parse_args()
+    lsArguments=vParser.parse_args()
 
     if lsArguments.simulate: print('** SIMULATION **')
 
@@ -52,15 +52,12 @@ if __name__ == "__main__":
         print(lsArguments.imagePath)
 
     dtStartTime=dt.datetime.now()
-    lsFiles=glob.glob(os.path.join(lsArguments.romPath,dcNamingScheme[stNamingScheme][0]))
+    lsFiles=glob.glob(os.path.join(lsArguments.romPath, dcNamingScheme[stNamingScheme][0]))
     lsFiles=sorted(lsFiles)
     if lsArguments.romPath=='':
         iStartCartridgeName=0
     else:
-        iStartCartridgeName=len(lsArguments.romPath)
-        if lsArguments.romPath[-1] not in ['/', '\\']:
-            iStartCartridgeName+=1
-
+        iStartCartridgeName=len(lsArguments.romPath.rstrip('/\\'))+1
 
     dcFiles={}
     for stFileName in lsFiles:
@@ -90,12 +87,12 @@ if __name__ == "__main__":
             elif stFileType=='G': stGromFileName=stFileName
         if lsArguments.verbose: print(f'== Creating cartrige {stCartridgeName} ==')
         if lsArguments.simulate:
-            print('createRom(stOutputFile=',os.path.join(lsArguments.imagePath,stCartridgeName)+'.bin',
+            print('createRom(stOutputFile=',os.path.join(lsArguments.imagePath, stCartridgeName)+'.bin',
                   ',stCrom=',stCromFileName,',stDrom=',stDromFileName,',stGrom=',stGromFileName,',stSystemromPath=',lsArguments.systemromPath,
                   ',blCheck=',lsArguments.check, ',blVerbose=',lsArguments.verbose, ',blDiskIO=',lsArguments.diskIO, ',blSpeech=',lsArguments.speech,')',sep='')
             iResult=-1
         else:
-            iResult=createRom(stOutputFile=os.path.join(lsArguments.imagePath,stCartridgeName)+'.bin',
+            iResult=createRom(stOutputFile=os.path.join(lsArguments.imagePath, stCartridgeName)+'.bin',
                               stCrom=stCromFileName,stDrom=stDromFileName,stGrom=stGromFileName,stSystemromPath=lsArguments.systemromPath,
                               blCheck=lsArguments.check, blVerbose=lsArguments.verbose, blDiskIO=lsArguments.diskIO, blSpeech=lsArguments.speech)
 
